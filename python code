@@ -1,0 +1,230 @@
+
+Examples and Counterexamples
+Problem. Does there exist a power of 
+ that starts with 
+?
+
+We can find an example of such a number using the following snippet.
+
+
+for n in range(100):
+    if int(str(2 ** n)[:2]) == 65:
+        print(f'2**{n}={2 ** n}')
+     
+2**16=65536
+Here, we use int(str(2 ** n)[:2]) to compute the first two digits of 
+. Indeed, the function str converts the value of 
+ into a string, then the slice [:2] takes the first two characters of this string, and finally the function int converts the result back into an integer.
+
+Problem. For every integer 
+, the number 
+ is prime (is not a product of two smaller integers). Is this statement true?
+
+The following program finds counterexamples to this statement (which means that the statement is not true).
+
+
+def is_prime(n):
+    assert n > 0
+    if n == 1:
+        return False
+
+    for d in range(2, n):
+        if n % d == 0:
+            return False
+
+    return True
+
+
+for n in range(1, 50):
+    if not is_prime(n ** 2 + n + 41):
+        print(n)
+     
+40
+41
+44
+49
+Here, the function is_prime checks whether the given positive integer 
+ is prime simply by checking all its potential divisors 
+ (recall that 
+ is not prime by convention). We then go through all 
+ and check if 
+ is prime. If it is not, we print 
+.
+
+Here's a shorter snippet that finds the first counterexample.
+
+
+def is_prime(n):
+    return n != 1 and all(n % d != 0 for d in range(2, n))
+
+
+print(next(n for n in range(2, 100) if
+           not is_prime(n * n + n + 41)))
+
+     
+40
+Problem. Do there exist positive integers 
+ such that 
+?
+
+Yes! And the following code finds some such triples of numbers.
+
+
+from itertools import combinations
+
+
+for a, b, c in combinations(range(1, 20), 3):
+    if a ** 2 + b ** 2 == c ** 2:
+        print(f'{a}**2 + {b}**2 = {c}**2')
+     
+3**2 + 4**2 = 5**2
+5**2 + 12**2 = 13**2
+6**2 + 8**2 = 10**2
+8**2 + 15**2 = 17**2
+9**2 + 12**2 = 15**2
+This code enumerates all triples 
+ (by using the combinations function from the itertools module). For each such triple, it checks whether 
+ (recall the Python notation a ** n for 
+).
+
+Problem -- Sum of powers conjecture. In 1769, Euler conjectured that for any integer 
+, to represent 
+th power of a positive integer as a sum of 
+th powers of positive integers one needs at least 
+ summands. In particular, equations
+
+ and 
+
+do not have solutions in positive integers. (Hence, Fermat's Last Theorem is a special case of this conjecture for 
+.) How can we disprove this conjecture? [Warning: this is rather hard, and serious tools like elliptic curves or a supercomputer were used to find a counterexample for 
+. For 
+, this is easier and can be done if you optimize the search procedure a bit.]
+
+To disprove Euler's conjecture, it is enough to give a single counterexample. For example, for 
+ one may take the following integers:
+
+
+The following code verifies that these numbers indeed form a counterexample. (It is also known that this is the only counterexample where all numbers are less than one million.)
+
+
+print(95800 ** 4 + 217519 ** 4 + 414560 ** 4)
+print(422481 ** 4)
+     
+31858749840007945920321
+31858749840007945920321
+Problem. Is it possible to represent 
+ as a sum of three (not necessarily positive) cubes? In other words, are there integers 
+ such that 
+? An affirmative answer to this question was found just recently (in 2019!). It took over a million of machine hours to find it, but checking the result is trivial:
+
+
+x = -80538738812075974
+y = 80435758145817515
+z = 12602123297335631
+
+print(x ** 3 + y ** 3 + z ** 3)
+     
+42
+Logic
+A proposition is a statement that is true or false. For example, I'm a human and 25 is a multiple of 7 are propositions (the first one is true, and the second one if false), while You should fly to the Moon is not a proposition. Using the language of mathematical logic, we create compound propositions from simple ones ("
+ and 
+ and 
+ divides 
+, or 
+ is a prime"). We use such propositions as conditions in if-statemenets and while-loops, and, thus, "give directions" to computer programs. Here are a few examples of propositions.
+
+
+print(3 < 5 and 7 < 5)
+print(3 < 5 and not(7 < 5))
+print(2+2 == 5 or 2+2 == 4)
+
+     
+False
+True
+True
+In the following code, the function foo prints out "Foo!". One of the conditions in the if-statement calls the function foo. Why don't we see "Foo!" in the output of the program?
+
+
+def foo():
+    print('Foo!')
+    return True
+
+
+if 2 + 2 == 5 and foo():
+    print('True')
+else:
+    print('False')
+     
+False
+This is known as lazy evaluation. The Python interpreter knows that the whole if-condition evaluates to False after evaluating its first part. That is why it does not even bother to call the foo() function (so "Foo!" is not printed). Try changing the order of two statements in the if$-statement and see what happens!
+
+The universal quantifier is a mathematical analogue of the function {all} in Python that outputs True if all elements in the list are True. Similarly, the existential quantifier is a mathematical formalization of the function any that outputs True if at least one of the elements in the list is True.
+
+For example, the following program verifies the following two statements with universal quantifiers:
+
+All integers in 
+ are even
+
+and
+
+All integers in 
+ are even.
+
+
+a = (6, 2, 4)
+print(all((i % 2 == 0) for i in a))
+a = (2, 7, 6)
+print(all((i % 2 == 0) for i in a))
+     
+True
+False
+Similarly, the following code evaluates the statements with the existential quantifier
+
+There is an even integer in 
+
+and
+
+There is an even integer in 
+
+
+a = (1, 7, 9)
+print(all((i % 2 == 0) for i in a))
+a = (9, 2, 3)
+print(any((i % 2 == 0) for i in a))
+     
+False
+True
+The negation of a universal quantifier is an existential quantifier; and the negation of an existential quantifier is a universal quantifier. For example, the negation of the statement
+
+For all 
+ is true
+
+is the statement
+
+There exists 
+, such that 
+ is false.
+
+
+def is_divisible_by_3(x):
+    return x % 3 == 0
+
+
+lst = [5, 17, 6, 10]
+
+print(not any([is_divisible_by_3(x) for x in lst]))
+print(all([not is_divisible_by_3(x) for x in lst]))
+     
+False
+False
+In this example, the function is_divisible_by_3(x) returns True or False when x is (or is not) a multiple of 
+. Here, True and False are Boolean values. We may want to check whether a list lst of integers contains a multiple of 
+. For that, we use a special Python construction. First, [is_divisible_by_3(x) for x in lst] is the list of Boolean values is_divisible_by_3(x) for all elements x in the list lst.
+
+In our example, lst=[5,17,6,10], so this list equals [False, False, True, False] (only 
+ is divisible by 
+). Then, any(S) checks whether there exists a True value in S, and not reverses the answer. This way, we evaluate the statement there is no element x in the list lst that is divisible by 
+.
+
+In the next line, we evaluate the statement all elements of lst are not divisible by 
+ and get the same answer False: there is no good element in the list if and only if all elements are bad.
